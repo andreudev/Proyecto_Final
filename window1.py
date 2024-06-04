@@ -25,9 +25,10 @@ def create_main_window():
     window4 = create_sales_window(main_window)
     window5 = create_reports_window(main_window)
 
-    # Crear la ventana de clientes
-    # window_show_clients = show_clients()
-
+    window2.protocol("WM_DELETE_WINDOW", window2.withdraw)
+    window3.protocol("WM_DELETE_WINDOW", window3.withdraw)
+    window4.protocol("WM_DELETE_WINDOW", window4.withdraw)
+    window5.protocol("WM_DELETE_WINDOW", window5.withdraw)
     # Ocultar las ventanas secundarias
     window2.withdraw()
     window3.withdraw()
@@ -68,7 +69,7 @@ def create_widgets_main_window(main_window, window2, window3, window4, window5):
         font=("Arial", 18),
         width=10,
         height=2,
-        command=lambda: show_clients_window(window2, master=main_window),
+        command=window2.deiconify,
     )
     boton_clientes.grid(row=1, column=1, padx=10, pady=10)
 
@@ -138,15 +139,3 @@ def create_widgets(main_window, window2, window3, window4, window5):
     create_widgets_clients(window2, main_window)
     # Llamar a la función que crea los widgets de la ventana productos
     create_widgets_products(window3, main_window)
-
-
-def show_clients_window(window2, master):
-    """
-    Mostrar la ventana de clientes y ocultar la ventana principal
-
-    Args:
-        window2 (tk.Toplevel): Ventana de clientes
-        master (tk.Tk): Ventana principal de la aplicación
-    """
-    window2.deiconify()
-    master.withdraw()

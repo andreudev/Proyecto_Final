@@ -150,7 +150,7 @@ def create_widgets_products(window3, master):
         font=("Arial", 14),
         width=15,
         height=1,
-        command=lambda: refresh_table(tabla_productos),
+        command=lambda: delete_product(entry_id_producto.get()),
     )
 
     boton_eliminar.grid(row=9, column=0, columnspan=2, padx=10, pady=10)
@@ -182,24 +182,25 @@ def create_widgets_products(window3, master):
 
     tabla.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-    estilo_tabla = tk.ttk.Style()
+    estilo_tabla = ttk.Style()
     estilo_tabla.configure("Treeview", rowheight=30)
-    tabla_productos = tk.ttk.Treeview(
+    tabla_productos = ttk.Treeview(
         frame2,
         columns=("ID", "Nombre", "Cantidad", "Costo", "Precio", "Vencimiento"),
         show="headings",
-        height=15,
+        height=20,
     )
 
     tabla_productos.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
 
+    # Configuracion de las columnas
     tabla_productos.heading("ID", text="ID")
     tabla_productos.heading("Nombre", text="Nombre")
     tabla_productos.heading("Cantidad", text="Cantidad")
     tabla_productos.heading("Costo", text="Costo")
     tabla_productos.heading("Precio", text="Precio")
     tabla_productos.heading("Vencimiento", text="Vencimiento")
-
+    # Configuracion de los anchos de las columnas
     tabla_productos.column("ID", width=50, anchor="center")
     tabla_productos.column("Nombre", width=150, anchor="center")
     tabla_productos.column("Cantidad", width=100, anchor="center")
@@ -313,6 +314,17 @@ def back_to_main_window(window3, master):
 
 
 def save_product(id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento):
+    """
+    Funcion para guardar un producto
+
+    Args:
+        id_producto (str): ID del producto
+        nombre_producto (str): Nombre del producto
+        cantidad (str): Cantidad del producto
+        costo (str): Costo del producto
+        precio (str): Precio del producto
+        f_vencimiento (str): Fecha de vencimiento del producto
+    """
     try:
         with open("./tablas/productos.csv", "r", newline="", encoding="utf-8") as file:
             reader = csv.DictReader(
@@ -378,6 +390,17 @@ def save_product(id_producto, nombre_producto, cantidad, costo, precio, f_vencim
 def update_product(
     id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
 ):
+    """
+    Funcion para actualizar un producto
+
+    Args:
+        id_producto (str): ID del producto
+        nombre_producto (str): Nombre del producto
+        cantidad (str): Cantidad del producto
+        costo (str): Costo del producto
+        precio (str): Precio del producto
+        f_vencimiento (str): Fecha de vencimiento del producto
+    """
     try:
         if (
             not id_producto
@@ -454,5 +477,75 @@ def update_product(
                             }
                         )
                 messagebox.showinfo("Actualizado", "Producto actualizado con exito")
+    except Exception as e:
+        print(e)
+
+
+def delete_product(id_producto):
+    """
+    Funcion para eliminar un producto
+
+    Args:
+        id_producto (str): ID del producto
+    """
+
+    try:
+        if not id_producto:
+            messagebox.showerror("Error", "El campo ID es obligatorio")
+            return
+        else:
+            with open(
+                "./tablas/productos.csv", "r", newline="", encoding="utf-8"
+            ) as file:
+                reader = csv.DictReader(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre_producto",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                next(reader)
+                rows = list(reader)
+                for row in rows:
+                    if row["id_producto"] == id_producto:
+                        break
+                else:
+                    messagebox.showerror("Error", "El producto no existe")
+                    return
+    except Exception as e:
+        print(e)
+
+    try:
+        with open("./tablas/productos.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre_producto",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            writer.writeheader()
+            for row in rows:
+                if row["id_producto"] == id_producto:
+                    continue
+                writer.writerow(
+                    {
+                        "id_producto": row["id_producto"],
+                        "nombre_producto": row["nombre_producto"],
+                        "cantidad": row["cantidad"],
+                        "costo": row["costo"],
+                        "precio": row["precio"],
+                        "f_vencimiento": row["f_vencimiento"],
+                    }
+                )
+            messagebox.showinfo("Eliminado", "Producto eliminado con exito")
     except Exception as e:
         print(e)

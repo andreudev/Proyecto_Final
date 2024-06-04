@@ -89,7 +89,7 @@ def create_widgets_clients(window2, master):
         font=("Arial", 14),
         width=15,
         height=1,
-        command=lambda: back_to_main(master, window2),
+        command=lambda: back_to_main(window2),
     )
     boton_volver.grid(row=10, column=0, padx=10, pady=10, columnspan=3)
 
@@ -277,7 +277,7 @@ def save_client(nombre, apellido, fecha_nacimiento, documento):
         print("Error al abrir el archivo", e)
 
 
-def back_to_main(master, window2):
+def back_to_main(window2):
     """
     Volver a la ventana principal
 
@@ -286,4 +286,3 @@ def back_to_main(master, window2):
         window2 (tk.Toplevel): Ventana de clientes
     """
     window2.withdraw()
-    master.deiconify()
