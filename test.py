@@ -2,10 +2,16 @@ import csv
 import csv
 
 
-columns = ["id_cliente", "nombre", "apellido", "fecha_nacimiento", "documento"]
-
+columns = [
+    "id_producto",
+    "nombre_producto",
+    "cantidad",
+    "costo",
+    "precio",
+    "f_vencimiento",
+]
 try:
-    with open("clientes.csv", "r") as file:
+    with open("./tablas/productos.csv", "r") as file:
         reader = csv.DictReader(file, fieldnames=columns)
         for row in reader:
             print(row)

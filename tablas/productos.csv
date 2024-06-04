@@ -1,3 +1,8 @@
-id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
-1, producto1, 10, 100, 150, 2020-01-01
-2, producto2, 20, 200, 250, 2020-01-02
+id_producto,nombre_producto,cantidad,costo,precio,f_vencimiento
+1,1,1,1,1,1
+2,1,1,1,1,1
+3, producto3, 30, 300, 350, 2020-01-03
+4,Carne,12,30,50,10/09/2002
+5,Papa,22,5,10,10/09/2024
+13,2312,32131,31231,312313,23131
+12,Carne Cerdo,12,30,50,09192024

@@ -100,6 +100,7 @@ def create_widgets_products(window3, master):
 
     entry_fecha_vencimiento.grid(row=6, column=1, padx=10, pady=10)
 
+    # Boton guardar
     boton_guardar = tk.Button(
         frame1,
         text="Guardar producto",
@@ -108,10 +109,52 @@ def create_widgets_products(window3, master):
         font=("Arial", 14),
         width=15,
         height=1,
+        command=lambda: save_product(
+            entry_id_producto.get(),
+            entry_nombre_producto.get(),
+            entry_cantidad_producto.get(),
+            entry_costo_compra.get(),
+            entry_precio_venta.get(),
+            entry_fecha_vencimiento.get(),
+        ),
     )
 
     boton_guardar.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
 
+    # Boton actualizar
+    boton_actualizar = tk.Button(
+        frame1,
+        text="Actualizar",
+        bg="blue",
+        fg="white",
+        font=("Arial", 14),
+        width=15,
+        height=1,
+        command=lambda: update_product(
+            entry_id_producto.get(),
+            entry_nombre_producto.get(),
+            entry_cantidad_producto.get(),
+            entry_costo_compra.get(),
+            entry_precio_venta.get(),
+            entry_fecha_vencimiento.get(),
+        ),
+    )
+
+    boton_actualizar.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
+    # Boton eliminar
+    boton_eliminar = tk.Button(
+        frame1,
+        text="Eliminar",
+        bg="blue",
+        fg="white",
+        font=("Arial", 14),
+        width=15,
+        height=1,
+        command=lambda: refresh_table(tabla_productos),
+    )
+
+    boton_eliminar.grid(row=9, column=0, columnspan=2, padx=10, pady=10)
+    # Boton volver
     boton_volver = tk.Button(
         frame1,
         text="Volver",
@@ -120,10 +163,10 @@ def create_widgets_products(window3, master):
         font=("Arial", 14),
         width=15,
         height=1,
-        command=window3.withdraw,
+        command=lambda: back_to_main_window(window3, master),
     )
 
-    boton_volver.grid(row=8, column=0, columnspan=2, padx=10, pady=10)
+    boton_volver.grid(row=10, column=0, columnspan=2, padx=10, pady=10)
 
     # Configuracion de la tabla
 
@@ -170,6 +213,18 @@ def create_widgets_products(window3, master):
 
     tabla_productos.config(yscrollcommand=scrollbar.set)
 
+    boton_refrescar = tk.Button(
+        frame2,
+        text="Refrescar",
+        bg="blue",
+        fg="white",
+        font=("Arial", 14),
+        width=15,
+        height=1,
+        command=lambda: refresh_table(tabla_productos),
+    )
+
+    boton_refrescar.grid(row=2, column=0, padx=10, pady=10)
     # Cargar datos de productos
 
     try:
@@ -200,5 +255,204 @@ def create_widgets_products(window3, master):
                     ),
                 )
 
+    except Exception as e:
+        print(e)
+
+
+def refresh_table(tabla_productos):
+    """
+    Funcion para refrescar la tabla de productos
+
+    Args:
+        tabla_productos (tk.ttk.Treeview): Tabla de productos
+    """
+
+    tabla_productos.delete(*tabla_productos.get_children())
+    try:
+        with open("./tablas/productos.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre_producto",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            next(reader)
+            for row in reader:
+                tabla_productos.insert(
+                    "",
+                    "end",
+                    values=(
+                        row["id_producto"],
+                        row["nombre_producto"],
+                        row["cantidad"],
+                        row["costo"],
+                        row["precio"],
+                        row["f_vencimiento"],
+                    ),
+                )
+
+    except Exception as e:
+        print(e)
+
+
+def back_to_main_window(window3, master):
+    """
+    Funcion para volver a la ventana principal
+
+    Args:
+        window3 (tk.Toplevel): Ventana de productos
+        master (tk.Tk): Ventana principal
+    """
+    window3.withdraw()
+    master.deiconify()
+
+
+def save_product(id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento):
+    try:
+        with open("./tablas/productos.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre_producto",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            next(reader)
+            for row in reader:
+                if row["id_producto"] == id_producto:
+                    messagebox.showerror("Error", "El producto ya existe")
+                    return
+    except Exception as e:
+        print(e)
+
+    try:
+        if (
+            not id_producto
+            or not nombre_producto
+            or not cantidad
+            or not costo
+            or not precio
+            or not f_vencimiento
+        ):
+            messagebox.showerror("Error", "Todos los campos son obligatorios")
+            return
+        else:
+            with open(
+                "./tablas/productos.csv", "a", newline="", encoding="utf-8"
+            ) as file:
+                writer = csv.DictWriter(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre_producto",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                writer.writerow(
+                    {
+                        "id_producto": id_producto,
+                        "nombre_producto": nombre_producto,
+                        "cantidad": cantidad,
+                        "costo": costo,
+                        "precio": precio,
+                        "f_vencimiento": f_vencimiento,
+                    }
+                )
+                messagebox.showinfo("Guardado", "Producto guardado con exito")
+    except Exception as e:
+        print(e)
+
+
+def update_product(
+    id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
+):
+    try:
+        if (
+            not id_producto
+            or not nombre_producto
+            or not cantidad
+            or not costo
+            or not precio
+            or not f_vencimiento
+        ):
+            messagebox.showerror("Error", "Todos los campos son obligatorios")
+            return
+        else:
+            with open(
+                "./tablas/productos.csv", "r", newline="", encoding="utf-8"
+            ) as file:
+                reader = csv.DictReader(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre_producto",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                next(reader)
+                rows = list(reader)
+                for row in rows:
+                    print(row)
+                    if row["id_producto"] == id_producto:
+                        break
+                else:
+                    messagebox.showerror("Error", "El producto no existe")
+                    return
+            with open(
+                "./tablas/productos.csv", "w", newline="", encoding="utf-8"
+            ) as file:
+                writer = csv.DictWriter(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre_producto",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                writer.writeheader()
+                for row in rows:
+                    print(row)
+                    if row["id_producto"] == id_producto:
+                        print("Actualizando producto", id_producto)
+                        writer.writerow(
+                            {
+                                "id_producto": id_producto,
+                                "nombre_producto": nombre_producto,
+                                "cantidad": cantidad,
+                                "costo": costo,
+                                "precio": precio,
+                                "f_vencimiento": f_vencimiento,
+                            }
+                        )
+                    else:
+                        writer.writerow(
+                            {
+                                "id_producto": row["id_producto"],
+                                "nombre_producto": row["nombre_producto"],
+                                "cantidad": row["cantidad"],
+                                "costo": row["costo"],
+                                "precio": row["precio"],
+                                "f_vencimiento": row["f_vencimiento"],
+                            }
+                        )
+                messagebox.showinfo("Actualizado", "Producto actualizado con exito")
     except Exception as e:
         print(e)
