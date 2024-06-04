@@ -1,6 +1,6 @@
 import tkinter as tk
 from window2 import create_clients_window, create_widgets_clients
-from window3 import create_products_window
+from window3 import create_products_window, create_widgets_products
 from window4 import create_sales_window
 from window5 import create_reports_window
 
@@ -136,6 +136,8 @@ def create_widgets(main_window, window2, window3, window4, window5):
     create_widgets_main_window(main_window, window2, window3, window4, window5)
     # Llamar a la función que crea los widgets de la ventana clientes
     create_widgets_clients(window2, main_window)
+    # Llamar a la función que crea los widgets de la ventana productos
+    create_widgets_products(window3, main_window)
 
 
 def show_clients_window(window2, master):

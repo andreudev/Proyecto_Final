@@ -33,7 +33,7 @@ def create_widgets_clients(window2, master):
     frame2 = tk.Frame(window2, bg="#D4D4D4", width=900, height=700)
     frame1.grid(row=0, column=0, sticky="nsew")
     frame2.grid(row=0, column=1, sticky="nsew")
-    frame2.columnconfigure(0, weight=1)
+    # frame2.columnconfigure(0, weight=1)
 
     # Crear los widgets de la ventana clientes
     texto_clientes = tk.Label(
@@ -130,6 +130,7 @@ def create_widgets_clients(window2, master):
     scrollbar.grid(row=1, column=2, sticky="nse")
     tabla_clientes.configure(yscrollcommand=scrollbar.set)
 
+    # Mostrar los clientes en la tabla
     try:
         with open("./tablas/clientes.csv", "r", newline="", encoding="utf-8") as file:
             reader = csv.DictReader(

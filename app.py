@@ -1,10 +1,8 @@
-import tkinter as tk
-import csv
-from window1 import *
-from window2 import *
-from window3 import *
-from window4 import *
-from window5 import *
+"""
+This module is responsible for creating the main window of the application.
+"""
+
+from window1 import create_main_window
 
 
 if __name__ == "__main__":
