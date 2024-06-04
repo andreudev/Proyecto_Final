@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
+from utils.checks import check_digit
 
 
 def create_products_window(master):
@@ -347,42 +348,35 @@ def save_product(id_producto, nombre_producto, cantidad, costo, precio, f_vencim
         print(e)
 
     try:
-        if (
-            not id_producto
-            or not nombre_producto
-            or not cantidad
-            or not costo
-            or not precio
-            or not f_vencimiento
+
+        if not check_digit(
+            id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
         ):
-            messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
-        else:
-            with open(
-                "./tablas/productos.csv", "a", newline="", encoding="utf-8"
-            ) as file:
-                writer = csv.DictWriter(
-                    file,
-                    fieldnames=(
-                        "id_producto",
-                        "nombre_producto",
-                        "cantidad",
-                        "costo",
-                        "precio",
-                        "f_vencimiento",
-                    ),
-                )
-                writer.writerow(
-                    {
-                        "id_producto": id_producto,
-                        "nombre_producto": nombre_producto,
-                        "cantidad": cantidad,
-                        "costo": costo,
-                        "precio": precio,
-                        "f_vencimiento": f_vencimiento,
-                    }
-                )
-                messagebox.showinfo("Guardado", "Producto guardado con exito")
+
+        with open("./tablas/productos.csv", "a", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre_producto",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            writer.writerow(
+                {
+                    "id_producto": id_producto,
+                    "nombre_producto": nombre_producto,
+                    "cantidad": cantidad,
+                    "costo": costo,
+                    "precio": precio,
+                    "f_vencimiento": f_vencimiento,
+                }
+            )
+            messagebox.showinfo("Guardado", "Producto guardado con exito")
     except Exception as e:
         print(e)
 
@@ -402,15 +396,9 @@ def update_product(
         f_vencimiento (str): Fecha de vencimiento del producto
     """
     try:
-        if (
-            not id_producto
-            or not nombre_producto
-            or not cantidad
-            or not costo
-            or not precio
-            or not f_vencimiento
+        if not check_digit(
+            id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
         ):
-            messagebox.showerror("Error", "Todos los campos son obligatorios")
             return
         else:
             with open(
@@ -430,7 +418,7 @@ def update_product(
                 next(reader)
                 rows = list(reader)
                 for row in rows:
-                    print(row)
+                    # print(row)
                     if row["id_producto"] == id_producto:
                         break
                 else:
@@ -452,9 +440,9 @@ def update_product(
                 )
                 writer.writeheader()
                 for row in rows:
-                    print(row)
+                    # print(row)
                     if row["id_producto"] == id_producto:
-                        print("Actualizando producto", id_producto)
+                        # print("Actualizando producto", id_producto)
                         writer.writerow(
                             {
                                 "id_producto": id_producto,
