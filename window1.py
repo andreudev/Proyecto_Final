@@ -16,7 +16,7 @@ def create_main_window():
     main_window = tk.Tk()
     main_window.title("GESTION DE NEGOCIO")
     main_window.iconbitmap("./scr/icono_venta.ico")
-    main_window.configure(bg="white")
+    main_window.configure(bg="#D4D4D4")
     main_window.resizable(0, 0)
 
     # Crear las ventanas secundarias
@@ -56,7 +56,7 @@ def create_widgets_main_window(main_window, window2, window3, window4, window5):
     texto_principal = tk.Label(
         main_window,
         text="BIENVENIDO A GESTION DE NEGOCIO",
-        bg="white",
+        bg="#D4D4D4",
         font=("Arial", 20, "bold"),
     )
     texto_principal.grid(row=0, column=0, columnspan=3, padx=10, pady=10)

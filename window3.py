@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
-from utils.checks import check_digit
+from utils.checks import check_digit_product
 
 
 def create_products_window(master):
@@ -349,7 +349,7 @@ def save_product(id_producto, nombre_producto, cantidad, costo, precio, f_vencim
 
     try:
 
-        if not check_digit(
+        if not check_digit_product(
             id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
         ):
             return
@@ -396,7 +396,7 @@ def update_product(
         f_vencimiento (str): Fecha de vencimiento del producto
     """
     try:
-        if not check_digit(
+        if not check_digit_product(
             id_producto, nombre_producto, cantidad, costo, precio, f_vencimiento
         ):
             return

@@ -2,6 +2,8 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import csv
 
+from utils.checks import check_digit_client
+
 
 def create_clients_window(master):
     """
@@ -81,6 +83,39 @@ def create_widgets_clients(window2, master):
         ),
     )
     boton_guardar_cliente.grid(row=9, column=0, padx=10, pady=10, columnspan=3)
+
+    # Botón de actualizar cliente
+    boton_actualizar_clientes = tk.Button(
+        frame1,
+        text="Actualizar Clientes",
+        bg="blue",
+        fg="white",
+        font=("Arial", 14),
+        width=15,
+        height=1,
+        command=lambda: update_clients(
+            entry_nombre_cliente.get(),
+            entry_apellido_cliente.get(),
+            entry_fecha_nacimiento.get(),
+            entry_documento.get(),
+        ),
+    )
+    boton_actualizar_clientes.grid(row=10, column=0, padx=10, pady=10, columnspan=3)
+
+    # Botón de eliminar cliente
+    boton_eliminar_cliente = tk.Button(
+        frame1,
+        text="Eliminar Cliente",
+        bg="red",
+        fg="white",
+        font=("Arial", 14),
+        width=15,
+        height=1,
+        command=lambda: delete_client(entry_documento.get()),
+    )
+    boton_eliminar_cliente.grid(row=11, column=0, padx=10, pady=10, columnspan=3)
+
+    # Botón de volver
     boton_volver = tk.Button(
         frame1,
         text="Volver",
@@ -91,7 +126,7 @@ def create_widgets_clients(window2, master):
         height=1,
         command=lambda: back_to_main(window2),
     )
-    boton_volver.grid(row=10, column=0, padx=10, pady=10, columnspan=3)
+    boton_volver.grid(row=12, column=0, padx=10, pady=10, columnspan=3)
 
     # Crear los widgets de la lista de clientes
     texto_lista_clientes = tk.Label(
@@ -220,6 +255,8 @@ def save_client(nombre, apellido, fecha_nacimiento, documento):
         documento (str): Documento del cliente
     """
     try:
+        if not check_digit_client(nombre, apellido, fecha_nacimiento, documento):
+            return
         with open("./tablas/clientes.csv", "r", newline="", encoding="utf-8") as file:
 
             reader = csv.DictReader(
@@ -286,3 +323,112 @@ def back_to_main(window2):
         window2 (tk.Toplevel): Ventana de clientes
     """
     window2.withdraw()
+
+
+def update_clients(nombre, apellido, fecha_nacimiento, documento):
+    """
+    Actualizar los datos de un cliente
+
+    Args:
+        nombre (str): Nombre del cliente
+        apellido (str): Apellido del cliente
+        fecha_nacimiento (str): Fecha de nacimiento del cliente
+        documento (str): Documento del cliente
+    """
+    try:
+        if not check_digit_client(nombre, apellido, fecha_nacimiento, documento):
+            return
+        with open("./tablas/clientes.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_cliente",
+                    "nombre",
+                    "apellido",
+                    "fecha_nacimiento",
+                    "documento",
+                ),
+            )
+
+            next(reader)
+            rows = list(reader)
+            for row in rows:
+                if row["documento"] == documento:
+                    row["nombre"] = nombre
+                    row["apellido"] = apellido
+                    row["fecha_nacimiento"] = fecha_nacimiento
+                    break
+            else:
+                messagebox.showerror("Error", "El cliente no se encuentra registrado")
+                return
+        with open("./tablas/clientes.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_cliente",
+                    "nombre",
+                    "apellido",
+                    "fecha_nacimiento",
+                    "documento",
+                ),
+            )
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(row)
+            messagebox.showinfo("Exito", "Cliente actualizado correctamente")
+
+    except Exception as e:
+        print("Error al abrir el archivo", e)
+
+
+def delete_client(documento):
+    """
+    Eliminar un cliente
+
+    Args:
+        documento (str): Documento del cliente
+    """
+    try:
+        if not documento:
+            messagebox.showerror("Error", "El documento es obligatorio")
+            return
+        elif not documento.isdigit():
+            messagebox.showerror("Error", "El documento debe ser un número")
+            return
+        with open("./tablas/clientes.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_cliente",
+                    "nombre",
+                    "apellido",
+                    "fecha_nacimiento",
+                    "documento",
+                ),
+            )
+            next(reader)
+            rows = list(reader)
+            for row in rows:
+                if row["documento"] == documento:
+                    rows.remove(row)
+                    break
+            else:
+                messagebox.showerror("Error", "El cliente no se encuentra registrado")
+                return
+        with open("./tablas/clientes.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_cliente",
+                    "nombre",
+                    "apellido",
+                    "fecha_nacimiento",
+                    "documento",
+                ),
+            )
+            writer.writeheader()
+            for row in rows:
+                writer.writerow(row)
+            messagebox.showinfo("Exito", "Cliente eliminado correctamente")
+    except Exception as e:
+        print("Error al abrir el archivo", e)
