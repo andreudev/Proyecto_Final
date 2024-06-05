@@ -189,7 +189,7 @@ def create_widgets_products(window3, master):
         frame2,
         columns=("ID", "Nombre", "Cantidad", "Costo", "Precio", "Vencimiento"),
         show="headings",
-        height=20,
+        height=13,
     )
 
     tabla_productos.grid(row=1, column=0, padx=10, pady=10, sticky="nsew")
