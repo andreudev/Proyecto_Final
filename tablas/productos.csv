@@ -1,9 +1,7 @@
-id_producto,nombre_producto,cantidad,costo,precio,f_vencimiento
-3,1,1,1,1,1
+id_producto,nombre,cantidad,costo,precio,f_vencimiento
 4,Carne,12,30,50,10/09/2002
 5,Papa,22,5,10,10/09/2024
-13,2312,32131,31231,312313,23131
-12,Carne Cerdo,12,30,50,09192024
+12,Carne Cerdo,12,30,50,10/09/2222
 11,Carne Res,12,30,50,09192024
 10,Carne Pollo,12,30,50,09192024
 9,Carne Pescado,12,30,50,09192024

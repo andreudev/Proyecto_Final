@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
+from datetime import date, datetime
+import csv
 from datetime import date
 
 
@@ -36,34 +38,12 @@ def create_widgets_sales(window4, master):
     entry_id_producto = tk.Entry(frame1, font=("Arial", 14))
     entry_id_producto.grid(row=2, column=1, padx=10, pady=10, sticky="nsew")
 
-    boton_buscar_producto = tk.Button(
-        frame1,
-        text="Buscar",
-        bg="blue",
-        fg="white",
-        font=("Arial", 12),
-        width=10,
-        height=1,
-    )
-    boton_buscar_producto.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
-
     label_documento_cliente = tk.Label(
         frame1, text="DOCUMENTO CLIENTE", bg="#D4D4D4", font=("Arial", 12)
     )
     label_documento_cliente.grid(row=4, column=1, padx=10, pady=10, sticky="nsew")
     entry_documento_cliente = tk.Entry(frame1, font=("Arial", 14))
     entry_documento_cliente.grid(row=5, column=1, padx=10, pady=10, sticky="nsew")
-
-    boton_buscar_cliente = tk.Button(
-        frame1,
-        text="Buscar",
-        bg="blue",
-        fg="white",
-        font=("Arial", 12),
-        width=10,
-        height=1,
-    )
-    boton_buscar_cliente.grid(row=5, column=2, padx=10, pady=10, sticky="nsew")
 
     boton_volver = tk.Button(
         frame1,
@@ -137,36 +117,17 @@ def create_widgets_sales(window4, master):
 
     label_cantidad = tk.Label(frame2, text="CANTIDAD", bg="#D4D4D4", font=("Arial", 12))
     label_cantidad.grid(row=2, column=2, padx=10, pady=10)
-    entry_cantidad = tk.Entry(frame2, font=("Arial", 14), justify="center")
+    entry_cantidad = tk.Entry(
+        frame2, font=("Arial", 14), justify="center", state="readonly"
+    )
     entry_cantidad.grid(row=3, column=2, padx=10, pady=10)
 
     label_precio = tk.Label(frame2, text="PRECIO", bg="#D4D4D4", font=("Arial", 12))
     label_precio.grid(row=2, column=3, padx=10, pady=10)
-    entry_precio = tk.Entry(frame2, font=("Arial", 14), justify="center")
+    entry_precio = tk.Entry(
+        frame2, font=("Arial", 14), justify="center", state="readonly"
+    )
     entry_precio.grid(row=3, column=3, padx=10, pady=10)
-
-    boton_agregar = tk.Button(
-        frame2,
-        text="AGREGAR",
-        bg="blue",
-        fg="white",
-        font=("Arial", 15),
-        width=10,
-        height=1,
-    )
-    boton_agregar.grid(row=4, column=1, padx=10, pady=10)
-
-    boton_eliminar = tk.Button(
-        frame2,
-        text="ELIMINAR",
-        bg="red",
-        fg="white",
-        font=("Arial", 15),
-        width=10,
-        height=1,
-    )
-
-    boton_eliminar.grid(row=4, column=2, padx=10, pady=10)
 
     # Crear la tabla
 
@@ -197,6 +158,37 @@ def create_widgets_sales(window4, master):
 
     tabla.configure(yscrollcommand=scrollbar.set)
 
+    # Crear los botones de la parte superior
+    boton_agregar = tk.Button(
+        frame2,
+        text="AGREGAR",
+        bg="blue",
+        fg="white",
+        font=("Arial", 15),
+        width=10,
+        height=1,
+        command=lambda: add_product_to_table(
+            entry_id_producto_frame2,
+            entry_nombre_producto,
+            entry_cantidad,
+            entry_precio,
+            tabla,
+        ),
+    )
+    boton_agregar.grid(row=4, column=1, padx=10, pady=10)
+
+    boton_eliminar = tk.Button(
+        frame2,
+        text="ELIMINAR",
+        bg="red",
+        fg="white",
+        font=("Arial", 15),
+        width=10,
+        height=1,
+        command=lambda: delete_product_from_table(tabla),
+    )
+
+    boton_eliminar.grid(row=4, column=2, padx=10, pady=10)
     # Crear los botones de la parte inferior
 
     boton_guardar = tk.Button(
@@ -222,10 +214,292 @@ def create_widgets_sales(window4, master):
 
     boton_cancelar.grid(row=6, column=2, padx=10, pady=10)
 
+    boton_buscar_cliente = tk.Button(
+        frame1,
+        text="Buscar",
+        bg="blue",
+        fg="white",
+        font=("Arial", 12),
+        width=10,
+        height=1,
+        command=lambda: client_search(
+            entry_documento_cliente.get(),
+            entry_nombre_cliente,
+            entry_apellido_cliente,
+            entry_documento_cliente_frame2,
+        ),
+    )
+    boton_buscar_cliente.grid(row=5, column=2, padx=10, pady=10, sticky="nsew")
+
+    boton_buscar_producto = tk.Button(
+        frame1,
+        text="Buscar",
+        bg="blue",
+        fg="white",
+        font=("Arial", 12),
+        width=10,
+        height=1,
+        command=lambda: product_search(
+            entry_id_producto.get(),
+            entry_nombre_producto,
+            entry_cantidad,
+            entry_precio,
+            entry_id_producto_frame2,
+        ),
+    )
+    boton_buscar_producto.grid(row=2, column=2, padx=10, pady=10, sticky="nsew")
+
 
 def back_to_main_window(window4, master):
     window4.withdraw()
     master.deiconify()
+
+
+def client_search(documento, entry_nombre, entry_apellido, entry_documento):
+    if documento == "":
+        messagebox.showerror("Error", "Ingrese un documento")
+        return
+    elif not documento.isdigit():
+        messagebox.showerror("Error", "El documento debe ser un número")
+        return
+    else:
+        # Buscar el cliente en la base de datos
+        try:
+            with open(
+                "./tablas/clientes.csv", "r", newline="", encoding="utf-8"
+            ) as file:
+                reader = csv.DictReader(
+                    file,
+                    fieldnames=(
+                        "id_cliente",
+                        "nombre",
+                        "apellido",
+                        "fecha_nacimiento",
+                        "documento",
+                    ),
+                )
+                next(reader)
+                rows = list(reader)
+                for row in rows:
+                    if row["documento"] == documento:
+                        nombre = row["nombre"]
+                        apellido = row["apellido"]
+                        documento = row["documento"]
+                        break
+                else:
+                    messagebox.showerror("Error", "Cliente no encontrado")
+                    return
+        except FileNotFoundError:
+            messagebox.showerror("Error", "No se encontró la base de datos de clientes")
+            return
+
+        entry_nombre.config(state="normal")
+        entry_apellido.config(state="normal")
+        entry_documento.config(state="normal")
+
+        entry_nombre.delete(0, tk.END)
+        entry_apellido.delete(0, tk.END)
+        entry_documento.delete(0, tk.END)
+
+        entry_nombre.insert(0, nombre)
+        entry_apellido.insert(0, apellido)
+        entry_documento.insert(0, documento)
+
+        entry_nombre.config(state="readonly")
+        entry_apellido.config(state="readonly")
+        entry_documento.config(state="readonly")
+
+
+def product_search(
+    id_producto, entry_nombre, entry_cantidad, entry_precio, entry_id_producto
+):
+
+    if id_producto == "":
+        messagebox.showerror("Error", "Ingrese un ID")
+        return
+    elif not id_producto.isdigit():
+        messagebox.showerror("Error", "El ID debe ser un número")
+        return
+    else:
+        # Buscar el producto en la base de datos
+        try:
+            with open(
+                "./tablas/productos.csv", "r", newline="", encoding="utf-8"
+            ) as file:
+                reader = csv.DictReader(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                next(reader)
+                rows = list(reader)
+                for row in rows:
+
+                    if row["id_producto"] == id_producto:
+                        id = row["id_producto"]
+                        nombre = row["nombre"]
+                        cantidad = row["cantidad"]
+                        precio = row["precio"]
+                        if (
+                            datetime.strptime(row["f_vencimiento"], "%d/%m/%Y").date()
+                            < datetime.now().date()
+                        ):
+                            messagebox.showerror("Error", f"Producto {nombre} vencido")
+                            return
+
+                        break
+                else:
+                    messagebox.showerror("Error", "Producto no encontrado")
+                    return
+        except FileNotFoundError:
+            messagebox.showerror(
+                "Error", "No se encontró la base de datos de productos"
+            )
+            return
+
+        entry_nombre.config(state="normal")
+        entry_cantidad.config(state="normal")
+        entry_precio.config(state="normal")
+        entry_id_producto.config(state="normal")
+
+        entry_nombre.delete(0, tk.END)
+        entry_cantidad.delete(0, tk.END)
+        entry_precio.delete(0, tk.END)
+        entry_id_producto.delete(0, tk.END)
+
+        entry_nombre.insert(0, nombre)
+        entry_cantidad.insert(0, cantidad)
+        entry_precio.insert(0, precio)
+        entry_id_producto.insert(0, id)
+
+        entry_nombre.config(state="readonly")
+        entry_cantidad.config(state="normal")
+        entry_precio.config(state="readonly")
+        entry_id_producto.config(state="readonly")
+
+
+def add_product_to_table(
+    entry_id_producto_frame2, entry_nombre_producto, entry_cantidad, entry_precio, tabla
+):
+    id_producto = entry_id_producto_frame2.get()
+    nombre_producto = entry_nombre_producto.get()
+    cantidad = entry_cantidad.get()
+    precio = entry_precio.get()
+
+    try:
+        with open("./tablas/productos.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            next(reader)
+            rows = list(reader)
+            for row in rows:
+                if row["id_producto"] == id_producto:
+                    if int(row["cantidad"]) < int(cantidad):
+                        messagebox.showerror(
+                            "Error", "No hay suficiente cantidad de productos"
+                        )
+                        return
+                    else:
+                        row["cantidad"] = str(int(row["cantidad"]) - int(cantidad))
+                    break
+            else:
+                messagebox.showerror("Error", "Producto no encontrado")
+                return
+
+        with open("./tablas/productos.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+
+    except FileNotFoundError:
+        messagebox.showerror("Error", "No se encontró la base de datos de productos")
+        return
+
+    for child in tabla.get_children():
+        if tabla.item(child)["values"][0] == id_producto:
+            messagebox.showerror("Error", "Producto ya agregado")
+            return
+
+    tabla.insert("", tk.END, values=(id_producto, nombre_producto, cantidad, precio))
+
+
+def delete_product_from_table(tabla):
+    selected = tabla.selection()
+    if not selected:
+        messagebox.showerror("Error", "Seleccione un producto")
+        return
+
+    id_producto = tabla.item(selected)["values"][0]
+    cantidad = tabla.item(selected)["values"][2]
+
+    try:
+        with open("./tablas/productos.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            next(reader)
+            rows = list(reader)
+            for row in rows:
+                if row["id_producto"] == str(id_producto):
+                    row["cantidad"] = str(int(row["cantidad"]) + int(cantidad))
+                    break
+            else:
+                messagebox.showerror("Error", "Producto no encontrado")
+                return
+
+        with open("./tablas/productos.csv", "w", newline="", encoding="utf-8") as file:
+            writer = csv.DictWriter(
+                file,
+                fieldnames=(
+                    "id_producto",
+                    "nombre",
+                    "cantidad",
+                    "costo",
+                    "precio",
+                    "f_vencimiento",
+                ),
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+    except FileNotFoundError:
+        messagebox.showerror("Error", "No se encontró la base de datos de productos")
+        return
+
+    messagebox.showinfo("Info", "Producto eliminado")
+    tabla.delete(selected)
 
 
 if __name__ == "__main__":
