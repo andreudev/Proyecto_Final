@@ -1,0 +1,10 @@
+id_venta,nombre_cliente,documento_cliente,fecha_venta,items
+1,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}]"
+2,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}]"
+3,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}]"
+4,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
+5,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}]"
+6,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Carne Cerdo', 'quantity': 1, 'unit_cost': 50}]"
+7,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Carne Cerdo', 'quantity': 1, 'unit_cost': 50}]"
+8,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Carne Cerdo', 'quantity': 1, 'unit_cost': 50}]"
+9,Andrew Sarmiento,1006464319,07/06/2024,"[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Carne Cerdo', 'quantity': 1, 'unit_cost': 50}]"

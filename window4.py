@@ -3,6 +3,8 @@ from tkinter import messagebox, ttk
 from datetime import date, datetime
 import csv
 from datetime import date
+from invoice_pdf import ApiConnector
+import json
 
 
 def create_sales_window(master):
@@ -199,6 +201,13 @@ def create_widgets_sales(window4, master):
         font=("Arial", 15),
         width=10,
         height=1,
+        command=lambda: save_sale(
+            entry_documento_cliente.get(),
+            entry_nombre_cliente.get(),
+            entry_apellido_cliente.get(),
+            entry_fecha_venta.get(),
+            tabla,
+        ),
     )
     boton_guardar.grid(row=6, column=1, padx=10, pady=10)
 
@@ -210,6 +219,7 @@ def create_widgets_sales(window4, master):
         font=("Arial", 15),
         width=10,
         height=1,
+        command=lambda: cancel_sale(tabla),
     )
 
     boton_cancelar.grid(row=6, column=2, padx=10, pady=10)
@@ -436,16 +446,16 @@ def add_product_to_table(
             writer.writeheader()
             writer.writerows(rows)
 
+        for child in tabla.get_children():
+            if tabla.item(child)["values"][0] == int(id_producto):
+                messagebox.showerror("Error", "Producto ya agregado")
+                return
+        tabla.insert(
+            "", tk.END, values=(id_producto, nombre_producto, cantidad, precio)
+        )
     except FileNotFoundError:
         messagebox.showerror("Error", "No se encontró la base de datos de productos")
         return
-
-    for child in tabla.get_children():
-        if tabla.item(child)["values"][0] == id_producto:
-            messagebox.showerror("Error", "Producto ya agregado")
-            return
-
-    tabla.insert("", tk.END, values=(id_producto, nombre_producto, cantidad, precio))
 
 
 def delete_product_from_table(tabla):
@@ -500,6 +510,161 @@ def delete_product_from_table(tabla):
 
     messagebox.showinfo("Info", "Producto eliminado")
     tabla.delete(selected)
+
+
+def save_sale(documento, nombre, apellido, fecha, tabla):
+    if not documento:
+        messagebox.showerror("Error", "Ingrese un documento")
+        return
+    elif not nombre:
+        messagebox.showerror("Error", "Ingrese un nombre")
+        return
+    elif not fecha:
+        messagebox.showerror("Error", "Ingrese una fecha")
+        return
+    elif not tabla.get_children():
+        messagebox.showerror("Error", "Agregue productos a la venta")
+        return
+
+    items = []
+    for child in tabla.get_children():
+        items.append(
+            {
+                "name": tabla.item(child)["values"][1],
+                "quantity": tabla.item(child)["values"][2],
+                "unit_cost": tabla.item(child)["values"][3],
+            }
+        )
+
+    try:
+        with open("./tablas/facturas.csv", "r", newline="", encoding="utf-8") as file:
+            reader = csv.DictReader(
+                file,
+                fieldnames=(
+                    "id_venta",
+                    "nombre_cliente",
+                    "documento_cliente",
+                    "fecha_venta",
+                    "items",
+                ),
+            )
+            next(reader)
+            rows = list(reader)
+            try:
+                last_id = int(rows[-1]["id_venta"])
+            except IndexError:
+                last_id = 0
+
+    except FileNotFoundError:
+        print("No se encontró la base de datos de facturas")
+
+    with open("./tablas/facturas.csv", "a", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(
+            file,
+            fieldnames=(
+                "id_venta",
+                "nombre_cliente",
+                "documento_cliente",
+                "fecha_venta",
+                "items",
+            ),
+        )
+        writer.writerow(
+            {
+                "id_venta": last_id + 1,
+                "nombre_cliente": f"{nombre} {apellido}",
+                "documento_cliente": documento,
+                "fecha_venta": fecha,
+                "items": items,
+            }
+        )
+
+        with open(
+            f"./facturas/factura{last_id + 1}_{fecha.replace('/', '-')}.txt",
+            "w",
+            encoding="utf-8",
+        ) as file:
+            file.write(
+                f"ID VENTA: {last_id + 1}\n"
+                f"NOMBRE CLIENTE: {nombre} {apellido}\n"
+                f"DOCUMENTO CLIENTE: {documento}\n"
+                f"FECHA VENTA: {fecha}\n"
+                f"ITEMS:"
+            )
+            total = 0
+            for item in items:
+                file.write(
+                    f"\n{item['name']:20} --- CANTIDAD {item['quantity']:5} --- {item['unit_cost']} COP"
+                )
+                total += int(item["quantity"]) * int(item["unit_cost"])
+            file.write(f"\nTOTAL: {total} COP")
+
+    api = ApiConnector()
+    api.connect_api_and_save_invoice_pdf(
+        "GESTOR DE VENTAS",
+        f"{nombre} {apellido} - {documento}",
+        last_id + 1,
+        fecha.replace("/", "-"),
+        items,
+    )
+
+    messagebox.showinfo("Info", "Venta guardada")
+
+    for child in tabla.get_children():
+        tabla.delete(child)
+
+
+def cancel_sale(tabla):
+    for child in tabla.get_children():
+        try:
+            with open(
+                "./tablas/productos.csv", "r", newline="", encoding="utf-8"
+            ) as file:
+                reader = csv.DictReader(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                next(reader)
+                rows = list(reader)
+                for row in rows:
+                    if row["id_producto"] == str(tabla.item(child)["values"][0]):
+                        row["cantidad"] = str(
+                            int(row["cantidad"]) + int(tabla.item(child)["values"][2])
+                        )
+                        break
+                else:
+                    messagebox.showerror("Error", "Producto no encontrado")
+                    return
+
+            with open(
+                "./tablas/productos.csv", "w", newline="", encoding="utf-8"
+            ) as file:
+                writer = csv.DictWriter(
+                    file,
+                    fieldnames=(
+                        "id_producto",
+                        "nombre",
+                        "cantidad",
+                        "costo",
+                        "precio",
+                        "f_vencimiento",
+                    ),
+                )
+                writer.writeheader()
+                writer.writerows(rows)
+        except FileNotFoundError:
+            messagebox.showerror(
+                "Error", "No se encontró la base de datos de productos"
+            )
+            return
+        tabla.delete(child)
 
 
 if __name__ == "__main__":

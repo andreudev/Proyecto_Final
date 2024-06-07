@@ -1,24 +1,34 @@
 import csv
 from datetime import date, datetime
+import json
 
-
-documento = 111111
-
-columns = [
-    "id_producto",
-    "nombre_producto",
-    "cantidad",
-    "costo",
-    "precio",
-    "f_vencimiento",
-]
 try:
-    with open(
-        f"./facturas/factura{documento}_{date.today().strftime('%d-%m-%Y')}.txt",
-        "w",
-        encoding="utf-8",
-    ) as file:
-        file.write("id_producto,nombre_producto,cantidad,costo,precio,f_vencimiento\n")
+    with open("./tablas/facturas.csv", "r") as file:
+        reader = csv.DictReader(
+            file,
+            fieldnames=(
+                "id_venta",
+                "nombre_cliente",
+                "documento_cliente",
+                "fecha_venta",
+                "items",
+            ),
+        )
+        next(reader)
+        for row in reader:
+            try:
+                items = json.loads(row["items"].replace("'", '"'))
+                print(items)
+            except json.decoder.JSONDecodeError:
+                print("Error al decodificar el JSON")
 
-except:
-    print("Error al abrir el archivo")
+except FileNotFoundError:
+    print("No se ha encontrado el archivo de facturas")
+
+
+# items = "[{'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}, {'name': 'Papa', 'quantity': 1, 'unit_cost': 10}]"
+
+# items = json.loads(items.replace("'", '"'))
+# print(items[0])
+# print(items[1])
+# print(type(items))
