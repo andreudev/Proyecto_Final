@@ -585,6 +585,7 @@ def save_sale(documento, nombre, apellido, fecha, tabla):
             encoding="utf-8",
         ) as file:
             file.write(
+                f"SUPER MUCHACHON S.A.S\n\n"
                 f"ID VENTA: {last_id + 1}\n"
                 f"NOMBRE CLIENTE: {nombre} {apellido}\n"
                 f"DOCUMENTO CLIENTE: {documento}\n"
