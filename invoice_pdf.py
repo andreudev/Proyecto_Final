@@ -4,7 +4,10 @@ import os
 
 class ApiConnector:
     def __init__(self) -> None:
-        self.headers = {"Content-Type": "application/json"}
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer sk_CtqgRZSvIF1t7pUwRoNvvtrkOaCsBuXl",
+        }
         self.url = "https://invoice-generator.com"
         self.invoice_directory = (
             f"{os.path.dirname(os.path.abspath(__file__))}/{'facturas'}"
