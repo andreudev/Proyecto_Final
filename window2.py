@@ -17,7 +17,7 @@ def create_clients_window(master):
     """
     clients_window = tk.Toplevel(master)
     clients_window.title("Clientes")
-    clients_window.iconbitmap("./scr/icono_venta.ico")
+    # clients_window.iconbitmap("./scr/icono_venta.ico")
     clients_window.configure(bg="white")
     return clients_window
 

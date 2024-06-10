@@ -1,5 +1,5 @@
 id_producto,nombre,cantidad,costo,precio,f_vencimiento
-4,Carne,21,30,50,10/09/2222
+4,Carne,19,30,50,10/09/2222
 5,Papa,22,5,10,10/09/2024
 6,Carne Cerdo,25,30,50,10/09/2222
 7,Carne,12,30,50,10/09/2222
@@ -8,4 +8,4 @@ id_producto,nombre,cantidad,costo,precio,f_vencimiento
 19,Papa,22,5,10,10/09/2024
 25,Carne,12,30,50,10/09/2002
 26,Papa,22,5,10,10/09/2024
-1,Detergente,28,5000,10000,12/09/2040
+1,Detergente,24,5000,10000,12/09/2040

@@ -13,3 +13,6 @@ id_venta,nombre_cliente,documento_cliente,fecha_venta,items
 12,admin admin,1,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
 13,admin admin,1,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
 14,admin admin,1,07/06/2024,"[{'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
+15,admin admin,1,07/06/2024,"[{'name': 'Detergente', 'quantity': 1, 'unit_cost': 10000}, {'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
+16,admin admin,1,09/06/2024,"[{'name': 'Detergente', 'quantity': 4, 'unit_cost': 10000}, {'name': 'Carne', 'quantity': 1, 'unit_cost': 50}]"
+17,admin admin,1,09/06/2024,"[{'name': 'Detergente', 'quantity': 1, 'unit_cost': 10000}]"

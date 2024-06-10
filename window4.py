@@ -193,6 +193,12 @@ def create_widgets_sales(window4, master):
     boton_eliminar.grid(row=4, column=2, padx=10, pady=10)
     # Crear los botones de la parte inferior
 
+    label_pago_cliente = tk.Label(
+        frame2, text="PAGO CLIENTE", bg="#D4D4D4", font=("Arial", 12)
+    )
+    label_pago_cliente.grid(row=6, column=0, padx=10, pady=10)
+    entry_pago_cliente = tk.Entry(frame2, font=("Arial", 14))
+    entry_pago_cliente.grid(row=6, column=1, padx=10, pady=10)
     boton_guardar = tk.Button(
         frame2,
         text="GUARDAR",
@@ -206,10 +212,11 @@ def create_widgets_sales(window4, master):
             entry_nombre_cliente.get(),
             entry_apellido_cliente.get(),
             entry_fecha_venta.get(),
+            entry_pago_cliente.get(),
             tabla,
         ),
     )
-    boton_guardar.grid(row=6, column=1, padx=10, pady=10)
+    boton_guardar.grid(row=7, column=1, padx=10, pady=10)
 
     boton_cancelar = tk.Button(
         frame2,
@@ -222,7 +229,7 @@ def create_widgets_sales(window4, master):
         command=lambda: cancel_sale(tabla),
     )
 
-    boton_cancelar.grid(row=6, column=2, padx=10, pady=10)
+    boton_cancelar.grid(row=7, column=2, padx=10, pady=10)
 
     boton_buscar_cliente = tk.Button(
         frame1,
@@ -512,7 +519,7 @@ def delete_product_from_table(tabla):
     tabla.delete(selected)
 
 
-def save_sale(documento, nombre, apellido, fecha, tabla):
+def save_sale(documento, nombre, apellido, fecha, pago, tabla):
     if not documento:
         messagebox.showerror("Error", "Ingrese un documento")
         return
@@ -535,6 +542,15 @@ def save_sale(documento, nombre, apellido, fecha, tabla):
                 "unit_cost": tabla.item(child)["values"][3],
             }
         )
+    total = 0
+    for item in items:
+        total += int(item["quantity"]) * int(item["unit_cost"])
+
+    if int(pago) < total:
+        messagebox.showerror("Error", "El pago no cubre el total de la venta")
+        return
+
+    messagebox.showinfo("Pago", f"El cambio es de {int(pago) - total} COP")
 
     try:
         with open("./tablas/facturas.csv", "r", newline="", encoding="utf-8") as file:
